@@ -19,8 +19,7 @@ jobs:
       - name: Set up Java version
         uses: actions/setup-java@v4
         with:
-          java-version: '11'
-          distribution: 'microsoft'
+          java-version: '8'
 
       - name: Build with Maven
         run: mvn clean install
@@ -37,27 +36,18 @@ jobs:
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    permissions:
-      id-token: write #This is required for requesting the JWT
-  
+
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v3
         with:
           name: java-app
-      
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_EB112D6C8C684FE9BF9ECC1C06521A2D }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_8868E89762F0488F98BE08E2AF92E296 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_9C349B864960491A930883149EC9FB89 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
+        uses: azure/webapps-deploy@v2
         with:
           app-name: 'logilabelnsandpitservice'
           slot-name: 'Production'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_8A45242625EB4847A65781A4F5337574 }}
           package: '*.jar'
-          
